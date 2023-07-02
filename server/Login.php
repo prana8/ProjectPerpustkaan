@@ -6,19 +6,6 @@ header("Content-Type: application/json; charset=UTF-8");
 // Mendapatkan data dari request
 $data = json_decode(file_get_contents("php://input"));
 
-// Menghubungkan ke database
-$host = "localhost";
-$dbname = "peminjaman_buku";
-$username = "root";
-$password = "";
-
-try {
-    $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Connection failed: " . $e->getMessage());
-}
-
 // Memeriksa keberadaan pengguna dengan email yang cocok
 try {
     $stmt = $conn->prepare("SELECT * FROM user WHERE email = :email");
@@ -33,7 +20,7 @@ try {
         if (password_verify($data->password, $user["password"])) {
             // Password cocok
             // Mengirim response status success beserta user_name
-            $response = array("status" => "success", "username" => $user["username"] );
+            $response = array("status" => "success", "username" => $user["username"]);
             echo json_encode($response);
         } else {
             // Password tidak cocok
@@ -54,4 +41,3 @@ try {
 
 // Menutup koneksi
 $conn = null;
-?>

@@ -3,21 +3,10 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: *");
 header("Content-Type: application/json; charset=UTF-8");
 
+include "./connection.php";
+
 // Mendapatkan data dari request
 $data = json_decode(file_get_contents("php://input"));
-
-// Menghubungkan ke database
-$host = "localhost";
-$dbname = "peminjaman_buku";
-$username = "root";
-$password = "";
-
-try {
-    $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Connection failed: " . $e->getMessage());
-}
 
 // Memasukkan data ke tabel user
 try {
@@ -40,4 +29,3 @@ try {
 
 // Menutup koneksi
 $conn = null;
-?>
