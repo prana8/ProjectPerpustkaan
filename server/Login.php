@@ -28,7 +28,8 @@ switch ($method) {
                     // Password cocok
                     // Mengirim response status success beserta user_name
                     $_SESSION["id"] = $user["id"];
-                    $response = array("status" => "success", "id" => $_SESSION["id"]);
+
+                    $response = array("status" => "success", "id" => $_SESSION["id"], "user_status" => $user['status']);
                     echo json_encode($response);
                 } else {
                     // Password tidak cocok

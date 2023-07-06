@@ -41,12 +41,17 @@ switch ($method) {
               break;
           }
 
-          $stmt = $conn->prepare("INSERT INTO subscription (id_user, tgl_berakhir, timekeeper, status) VALUES (:id, :tgl_berakhir, :timekeeper, 1)");
+          $stmt = $conn->prepare("INSERT INTO subscription (id_user, tgl_berakhir, timekeeper, status) VALUES (:id, :tgl_berakhir, :timekeeper)");
           $stmt->bindParam(":id", $user['id']);
+          date_default_timezone_set('Asia/Jakarta');
           $tgl_berakhir = date_add(date_create(date('Y-m-d H:i:s')), date_interval_create_from_date_string($masaBerlaku))->format('Y-m-d H:i:s');
           $timekeeper = date_add(date_create(date('Y-m-d H:i:s')), date_interval_create_from_date_string($kuota))->format('Y-m-d H:i:s');
           $stmt->bindParam(":tgl_berakhir", $tgl_berakhir);
           $stmt->bindParam(":timekeeper", $timekeeper);
+          $stmt->execute();
+
+          $stmt = $conn->prepare("UPDATE user SET status = 1 WHERE id=:id");
+          $stmt->bindParam(":id", $user['id']);
           $stmt->execute();
 
           $response = array("status" => "success", "message" => "subscription added");
