@@ -4,7 +4,7 @@ header("Access-Control-Allow-Headers: *");
 header("Content-Type: application/json; charset=UTF-8");
 
 
-include './connection.php';
+include './Connection.php';
 // Mendapatkan data dari request
 $data = json_decode(file_get_contents("php://input"));
 
