@@ -4,7 +4,7 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: *");
 header("Content-Type: application/json; charset=UTF-8");
 
-include "./connection.php";
+include "./Connection.php";
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
@@ -24,5 +24,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         echo json_encode(array('message' => 'Error: ' . $e->getMessage()));
     }
 }
-
-?>
