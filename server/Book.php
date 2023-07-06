@@ -4,8 +4,10 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: *");
 
 
-include "./connection.php";
+include "./Connection.php";
 
+$path = $_SERVER['PATH_INFO'];
+$id = substr($path, 1);
 
 
 try{
@@ -13,19 +15,23 @@ try{
 
 switch ($method) {
   case "GET":
-    $sql = "SELECT book_pdf FROM buku WHERE id = 1";
-    $result = $conn->query($sql);
-    $row = $result->fetch(PDO::FETCH_ASSOC);
-    if ($row) {
-      $pdfData = $row['book_pdf'];
+    $stmt = $conn->prepare("SELECT book_pdf FROM buku WHERE id = :id");
+    $stmt->bindParam(":id", $id);
+    $stmt->execute();
 
-      // Set the appropriate headers
+    if ($stmt->rowCount() > 0) {
+      // Pengguna ditemukan, mengambil data pengguna dari hasil query
+      $book = $stmt->fetch(PDO::FETCH_ASSOC);
+      $pdfData = $book['book_pdf'];
+
       header("Content-type: application/pdf");
       header("Content-Disposition: inline; filename=" . $pdfData . ".pdf");
 
       echo $pdfData;
     } else {
-      echo "No PDF found.";
+      // Pengguna tidak ditemukan, mengirim response status error
+      $response = array("status" => "error", "message" => "Error fetch PDF");
+      echo json_encode($response);
     }
 
     break;
@@ -34,3 +40,4 @@ switch ($method) {
   echo "Koneksi gagal", $e->getMessage();
 }
 
+$conn = null;
