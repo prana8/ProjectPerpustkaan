@@ -41,14 +41,32 @@ switch ($method) {
               break;
           }
 
-          $stmt = $conn->prepare("INSERT INTO subscription (id_user, tgl_berakhir, timekeeper, status) VALUES (:id, :tgl_berakhir, :timekeeper)");
+          // Mengecek sudah ada berlangganan atau belum
+          $stmt = $conn->prepare("SELECT * FROM subscription WHERE id_user=:id");
           $stmt->bindParam(":id", $user['id']);
-          date_default_timezone_set('Asia/Jakarta');
-          $tgl_berakhir = date_add(date_create(date('Y-m-d H:i:s')), date_interval_create_from_date_string($masaBerlaku))->format('Y-m-d H:i:s');
-          $timekeeper = date_add(date_create(date('Y-m-d H:i:s')), date_interval_create_from_date_string($kuota))->format('Y-m-d H:i:s');
-          $stmt->bindParam(":tgl_berakhir", $tgl_berakhir);
-          $stmt->bindParam(":timekeeper", $timekeeper);
           $stmt->execute();
+          if ($stmt->rowCount() > 0) {
+            // jika ada akan ditimpa
+            $stmt = $conn->prepare("UPDATE subscription SET tgl_mulai=:tgl_mulai, tgl_berakhir=:tgl_berakhir, timekeeper=:timekeeper WHERE id_user=:id");
+            date_default_timezone_set('Asia/Jakarta');
+            $tgl_mulai = date_create(date('Y-m-d H:i:s'))->format('Y-m-d H:i:s');
+            $tgl_berakhir = date_add(date_create(date('Y-m-d H:i:s')), date_interval_create_from_date_string($masaBerlaku))->format('Y-m-d H:i:s');
+            $timekeeper = date_add(date_create(date('Y-m-d H:i:s')), date_interval_create_from_date_string($kuota))->format('Y-m-d H:i:s');
+            $stmt->bindParam(":id", $user['id']);
+            $stmt->bindParam(":tgl_mulai", $tgl_mulai);
+            $stmt->bindParam(":tgl_berakhir", $tgl_berakhir);
+            $stmt->bindParam(":timekeeper", $timekeeper);
+            $stmt->execute();
+          } else {
+            $stmt = $conn->prepare("INSERT INTO subscription (id_user, tgl_berakhir, timekeeper) VALUES (:id, :tgl_berakhir, :timekeeper)");
+            $stmt->bindParam(":id", $user['id']);
+            date_default_timezone_set('Asia/Jakarta');
+            $tgl_berakhir = date_add(date_create(date('Y-m-d H:i:s')), date_interval_create_from_date_string($masaBerlaku))->format('Y-m-d H:i:s');
+            $timekeeper = date_add(date_create(date('Y-m-d H:i:s')), date_interval_create_from_date_string($kuota))->format('Y-m-d H:i:s');
+            $stmt->bindParam(":tgl_berakhir", $tgl_berakhir);
+            $stmt->bindParam(":timekeeper", $timekeeper);
+            $stmt->execute();
+          }
 
           $stmt = $conn->prepare("UPDATE user SET status = 1 WHERE id=:id");
           $stmt->bindParam(":id", $user['id']);
